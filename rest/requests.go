@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"crypto/tls"
 )
 
 const (
@@ -23,7 +24,10 @@ const (
 func getData(url, user, password string) []byte {
 	fmt.Println("Getting data from", url)
 
-	client := &http.Client{}
+        customTransport := http.DefaultTransport.(*http.Transport).Clone()
+        customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+
+        client := &http.Client{Transport: customTransport}
 	req, err := http.NewRequest("GET", url, nil)
 	req.SetBasicAuth(user, password)
 	resp, err := client.Do(req)
